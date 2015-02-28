@@ -56,9 +56,9 @@ int main (void)
 	
 	for(;;)
 	{
-		puts("Hello world!");
-		input = getchar();
-		printf("You wrote %c\n", input);
+		puts("Hello!");
+//		input = getchar();
+//		printf("You wrote %c\n", input);
 		PORTB ^= _BV(PB0);
 		_delay_ms(500);
 

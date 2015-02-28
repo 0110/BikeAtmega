@@ -11,18 +11,13 @@
 #endif
 #include <util/setbaud.h>
 
-#define MYUBRR (F_CPU/16/BAUD-1)
-
 /* http://www.cs.mun.ca/~rod/Winter2007/4723/notes/serial/serial.html */
 
 void uart_init(void) {
-//    UBRRH = UBRRH_VALUE;
-//    UBRRL = UBRRL_VALUE;
-
     /* Set baud rate */
-    UBRRH = (unsigned char)(MYUBRR>>8);
-    UBRRL = (unsigned char)MYUBRR;
-    
+    UBRRH = UBRRH_VALUE;
+    UBRRL = UBRRL_VALUE;
+
     UCSRC = (1<<URSEL)|(1<<USBS)|(3<<UCSZ0); /* Set frame format: 8data, 2stop bit */
     UCSRB = _BV(RXEN) | _BV(TXEN);   /* Enable RX and TX */    
 }
