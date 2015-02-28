@@ -12,10 +12,8 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/sleep.h>
-
-#define BAUDRATE 9600
-//calculate UBRR value
-#define UBRRVAL ((F_CPU/(BAUDRATE*16UL))-1)
+#include <stdio.h>
+#include "uart.h"
 
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
@@ -37,57 +35,25 @@ void timer_init (void)
 	TCCR1B = (1<<CS10) | (1<<CS12); // 8MHz/65536/1024 = 0,11Hz --> 8,38s
 }
 
-/** @fn ISR(USART1_RXC_vect)
- *
- */
-ISR(USART1_RX_vect)
-{
-	//defien temp value for storing received byte
-	uint8_t Temp;
-
-	//Store data to temp
-	Temp=UDR;
-	Temp++;//increment
-
-	//send received data back
-
-	// no need to wait for empty send buffer
-	UDR=Temp;
-}
-
-/** @fn void usart_init(void)
- * @brief initialize the UART
- */
-void usart_init(void)
-{
-	//Set baud rate
-	UBRRL=UBRRVAL;		//low byte
-	UBRRH=(UBRRVAL>>8);	//high byte
-
-	//Set data frame format: asynchronous mode,no parity, 1 stop bit, 8 bit size
-	UCSRC=(1<<URSEL)|(0<<UMSEL)|(0<<UPM1)|(0<<UPM0)|
-		(0<<USBS)|(0<<UCSZ2)|(1<<UCSZ1)|(1<<UCSZ0);	
-
-	//Enable Transmitter and Receiver and Interrupt on receive complete
-	UCSRB=(1<<RXEN)|(1<<TXEN)|(1<<RXCIE);
-
-	//enable global interrupts
-	set_sleep_mode(SLEEP_MODE_IDLE);
-}
-
 /** @fn int main (void)
 * @brief main entry point
 * Initializing the hardware IO, the timer and the SPI logic.
 */
 int main (void)
 {
-	usart_init();
 	//timer_init();
-	sei ();
+	uart_init();
+	stdout = &uart_output;
+	stdin = &uart_input;
+	//sei ();
 	
+	char input;
+
 	for(;;)
 	{
-		sleep_mode();
+		puts("Hello world!");
+		input = getchar();
+		printf("You wrote %c\n", input);
 	}
 	return 0;
 }

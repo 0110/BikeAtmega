@@ -5,9 +5,7 @@
 # based on WinAVR Makefile Template written by Eric B. Weddington, J�rg Wunsch, et al.
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
-#Original: SRC = $(TARGET).c uart.c timer.c buzzer.c
-
+SRC = $(TARGET).c uart.c
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
