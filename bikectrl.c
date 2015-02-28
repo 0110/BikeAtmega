@@ -53,14 +53,15 @@ int main (void)
 	
 	char input;
 
+	
 	for(;;)
 	{
-		PORTB ^= _BV(PB0);
-		_delay_ms(500);
-/*		puts("Hello world!");
+		puts("Hello world!");
 		input = getchar();
 		printf("You wrote %c\n", input);
-*/
+		PORTB ^= _BV(PB0);
+		_delay_ms(500);
+
 	}
 	return 0;
 }
