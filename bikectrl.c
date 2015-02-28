@@ -46,14 +46,21 @@ int main (void)
 	stdout = &uart_output;
 	stdin = &uart_input;
 	//sei ();
+
+	/**** Set ports ****/
+	/* Debug output LED */
+	DDRB |= _BV(DDB0); /* Pin 14 lower left corner */
 	
 	char input;
 
 	for(;;)
 	{
-		puts("Hello world!");
+		PORTB ^= _BV(PB0);
+		_delay_ms(500);
+/*		puts("Hello world!");
 		input = getchar();
 		printf("You wrote %c\n", input);
+*/
 	}
 	return 0;
 }
