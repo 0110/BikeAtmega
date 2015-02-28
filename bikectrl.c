@@ -41,18 +41,20 @@ void timer_init (void)
 */
 int main (void)
 {
-	//timer_init();
+	/* Initialize the Timer */
+	timer_init();
+	/* Init the serial interface */
 	uart_init();
 	stdout = &uart_output;
 	stdin = &uart_input;
-	//sei ();
+
+	sei ();
 
 	/**** Set ports ****/
 	/* Debug output LED */
 	DDRB |= _BV(DDB0); /* Pin 14 lower left corner */
 	
 	char input;
-
 	
 	for(;;)
 	{
