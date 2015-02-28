@@ -17,7 +17,7 @@
 
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
-* Logic to stop the motor (release the relais) after a timeout
+* Set the speed to zero, if there was no tick found
 */
 ISR (TIMER1_OVF_vect)
 {
@@ -26,12 +26,11 @@ ISR (TIMER1_OVF_vect)
 
 /** @fn void timer_init (void)
 * @brief activiation of the timer.
-* The timer is necessary to trigger a timeout, after which always the motor is stopped.
 */
 void timer_init (void)
 {
 	TIMSK |= (1<<TOIE1); // Timer Overflow Interrupt enable
-	TCNT1 = 0; // Rücksetzen des Timers
+	TCNT1 = 0; // Reset of the timer
 	TCCR1B = (1<<CS10) | (1<<CS12); // 8MHz/65536/1024 = 0,11Hz --> 8,38s
 }
 
