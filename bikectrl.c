@@ -40,7 +40,7 @@ void timer_init (void)
 /** @fn ISR(USART1_RXC_vect)
  *
  */
-ISR(USART1_RXC_vect)
+ISR(USART1_RX_vect)
 {
 	//defien temp value for storing received byte
 	uint8_t Temp;
@@ -82,11 +82,13 @@ void usart_init(void)
 int main (void)
 {
 	usart_init();
-	timer_init();
+	//timer_init();
 	sei ();
 	
-	sleep_mode();
-
+	for(;;)
+	{
+		sleep_mode();
+	}
 	return 0;
 }
 
