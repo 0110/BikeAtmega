@@ -173,6 +173,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex -P $(AVRDUDE_PORT)
 #AVRDUDE_WRITE_FUSES = -U lfuse:w:0x4e:m -U hfuse:w:0x99:m -U efuse:w:0xfc:m
 AVRDUDE_WRITE_FUSES = -U lfuse:w:0xe4:m -U hfuse:w:0xd9:m -P $(AVRDUDE_PORT)
 
+AVRDUDE_READ_FUSES = -U hfuse:r:high.txt:s -U lfuse:r:low.txt:s
 
 # Uncomment the following if you want avrdude's erase cycle counter.
 # Note that this counter needs to be initialized first using -Yn,
@@ -192,7 +193,7 @@ AVRDUDE_FLAGS = -p $(MCU) -c $(AVRDUDE_PROGRAMMER)
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
-
+AVRDUDE_FLAGS += -P usb
 
 
 #---------------- Debugging Options ----------------
@@ -335,7 +336,12 @@ program: $(TARGET).hex $(TARGET).eep
 fuse: 
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FUSES)
 
-
+fuseread:
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_READ_FUSES)
+	@echo "===== High.txt ====="
+	@cat high.txt
+	@echo "===== Low.txt ====="
+	@cat low.txt
 
 # Generate avr-gdb config/init file which does the following:
 #     define the reset signal, load the target file, connect to target, and set 
