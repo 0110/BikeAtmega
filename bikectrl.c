@@ -21,7 +21,7 @@
 */
 ISR (TIMER1_OVF_vect)
 {
-
+	PORTB ^= _BV(PB0);
 }
 
 volatile unsigned int presses=0;
@@ -31,7 +31,6 @@ volatile unsigned int presses=0;
  */
 ISR(INT0_vect)
 {
-	PORTB ^= _BV(PB0);
 	presses++;
 }
 
@@ -58,13 +57,14 @@ int main (void)
 	stdout = &uart_output;
 	stdin = &uart_input;
 	/* Initialize Interrupt input */
-	DDRD = 1<<PD2;		// Set PD2 as input (Using for interupt INT0)
-	PORTD = 1<<PD2;		// Enable PD2 pull-up resistor
-	GICR = 1<<INT0;                 // Enable INT0
-	MCUCR = 1<<ISC01 | 1<<ISC00;	// Trigger INT0 on rising edge
+	DDRD = _BV(PD2);		// Set PD2 as input (Using for interupt INT0)
+	PORTD = _BV(PD2);		// Enable PD2 pull-up resistor
+	GICR = _BV(INT0);                 // Enable INT0
+	MCUCR = _BV(ISC01) | _BV(ISC00);	// Trigger INT0 on rising edge
 
 	sei ();
 
+	printf("Booted\n");
 	for(;;)
 	{
 		printf("Pressed %d times\n", presses);
