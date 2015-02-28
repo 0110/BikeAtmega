@@ -24,6 +24,17 @@ ISR (TIMER1_OVF_vect)
 
 }
 
+volatile unsigned int presses=0;
+
+/** @fn ISR(INT0_vect)
+ * Interrupt Service Routine for INT0
+ */
+ISR(INT0_vect)
+{
+	PORTB ^= _BV(PB0);
+	presses++;
+}
+
 /** @fn void timer_init (void)
 * @brief activiation of the timer.
 */
@@ -46,21 +57,19 @@ int main (void)
 	uart_init();
 	stdout = &uart_output;
 	stdin = &uart_input;
+	/* Initialize Interrupt input */
+	DDRD = 1<<PD2;		// Set PD2 as input (Using for interupt INT0)
+	PORTD = 1<<PD2;		// Enable PD2 pull-up resistor
+	GICR = 1<<INT0;                 // Enable INT0
+	MCUCR = 1<<ISC01 | 1<<ISC00;	// Trigger INT0 on rising edge
 
 	sei ();
 
-	/**** Set ports ****/
-	/* Debug output LED */
-	DDRB |= _BV(DDB0); /* Pin 14 lower left corner */
-	
-	char input;
-	
 	for(;;)
 	{
-		puts("Hello!");
+		printf("Pressed %d times\n", presses);
 //		input = getchar();
 //		printf("You wrote %c\n", input);
-		PORTB ^= _BV(PB0);
 		_delay_ms(500);
 
 	}
