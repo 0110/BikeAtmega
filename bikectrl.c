@@ -30,6 +30,8 @@ ISR (TIMER1_OVF_vect)
 
 	/* Reset the ticks */
 	presses=0;
+	impulse1=0;
+	impulse2=0;
 }
 
 /** @fn ISR(INT0_vect)
