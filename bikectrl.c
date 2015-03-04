@@ -51,8 +51,11 @@ ISR(INT0_vect)
 	presses++;
 
 	/* store the counter value of the last two pulses */
-	impulse1=impulse2;
-	impulse2=TCNT1;
+	if (impulse2 != TCNT1) /* software debouncing */
+	{
+		impulse1=impulse2;
+		impulse2=TCNT1;
+	}
 }
 
 /** @fn void timer_init (void)
