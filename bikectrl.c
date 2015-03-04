@@ -15,16 +15,18 @@
 #include <stdio.h>
 #include "uart.h"
 
+volatile unsigned int presses=0;
+
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
 * Set the speed to zero, if there was no tick found
 */
 ISR (TIMER1_OVF_vect)
 {
-	PORTB ^= _BV(PB0);
+	PORTB ^= _BV(PB0); /* Debug Blink-LED */
+	/* Reset the ticks */
+	presses=0;
 }
-
-volatile unsigned int presses=0;
 
 /** @fn ISR(INT0_vect)
  * Interrupt Service Routine for INT0
