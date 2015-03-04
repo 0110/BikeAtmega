@@ -17,6 +17,9 @@
 
 volatile unsigned int presses=0;
 
+volatile unsigned int impulse1=0;
+volatile unsigned int impulse2=0;
+
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
 * Set the speed to zero, if there was no tick found
@@ -24,6 +27,7 @@ volatile unsigned int presses=0;
 ISR (TIMER1_OVF_vect)
 {
 	PORTB ^= _BV(PB0); /* Debug Blink-LED */
+
 	/* Reset the ticks */
 	presses=0;
 }
@@ -34,6 +38,10 @@ ISR (TIMER1_OVF_vect)
 ISR(INT0_vect)
 {
 	presses++;
+
+	/* store the counter value of the last two pulses */
+	impulse1=impulse2;
+	impulse2=TCNT1;
 }
 
 /** @fn void timer_init (void)
@@ -72,7 +80,7 @@ int main (void)
 	printf("Booted\n");
 	for(;;)
 	{
-		printf("Pressed %d times\n", presses);
+		printf("Pressed %3d times last pulses: %3u, %3u\n", presses, impulse1, impulse2);
 //		input = getchar();
 //		printf("You wrote %c\n", input);
 		_delay_ms(500);
