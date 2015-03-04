@@ -41,7 +41,7 @@ void timer_init (void)
 {
 	TIMSK |= (1<<TOIE1); // Timer Overflow Interrupt enable
 	TCNT1 = 0; // Reset of the timer
-	TCCR1B = (1<<CS10) | (1<<CS12); // 8MHz/65536/1024 = 0,11Hz --> 8,38s
+	TCCR1B = (1<<CS12); /* 8MHz * 256 * 65536--> 0,11 Between two overruns: 2,09s */
 }
 
 /** @fn int main (void)
@@ -61,6 +61,9 @@ int main (void)
 	PORTD = _BV(PD2);		// Enable PD2 pull-up resistor
 	GICR = _BV(INT0);                 // Enable INT0
 	MCUCR = _BV(ISC01) | _BV(ISC00);	// Trigger INT0 on rising edge
+
+	/* Debug output LED */
+	DDRB |= _BV(DDB0); /* Pin 14 lower left corner */
 
 	sei ();
 
