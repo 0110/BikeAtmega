@@ -69,9 +69,14 @@ void timer_init (void)
 
 uint16_t calculateSpeed()
 {
-	int diff = impulse2 - impulse2;
+	int diff = impulse2 - impulse1;
+	if (diff == 0)
+	{
+		return 0;
+	}
 	uint16_t diffMs = (diff * PRESCALER_FACTOR * HZ2MS) / F_CPU;
-	return (uint16_t) ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
+	uint16_t km_h = ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
+	return km_h;
 }
 
 /** @fn int main (void)
@@ -103,7 +108,7 @@ int main (void)
 	for(;;)
 	{
 		speed = calculateSpeed();
-		printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %d km/h\n", presses, impulse1, impulse2, speed);
+		printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %u km/h\n", presses, impulse1, impulse2, speed);
 //		input = getchar();
 //		printf("You wrote %c\n", input);
 		_delay_ms(500);
