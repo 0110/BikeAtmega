@@ -5,8 +5,6 @@
 * @version 0.1
 *
 * 
-* Sources:
-* - http://winavr.scienceprog.com/avr-gcc-tutorial/interrupt-driven-avr-usart-communication.html
 */
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -15,10 +13,20 @@
 #include <stdio.h>
 #include "uart.h"
 
+#define PRESCALER_FACTOR	1024	/**< Factore needed to calculate the detected tick-frequency */
+
+#define CENTIMETER_PER_ROTATION	686	/**< The length of the wheel, FIXME: Make this value variable in the flash */
+#define MAGIC_FACTOR		36	/**< This is the last number, resulting of the convertion:
+					 * - from ms to seconds
+					 * - m/s to km/h
+					 * - length in cm by one rotation of the wheel
+					 */
+#define TWO_DIGITS_AFTER_DOT	100	/**< Display 425 for 4.25km/h */
+
 volatile unsigned int presses=0;
 
-volatile unsigned int impulse1=0;
-volatile unsigned int impulse2=0;
+volatile unsigned int impulse1=0;	/**< Counter value of the timer (necessary to calculate the speed) */
+volatile unsigned int impulse2=0;	/**< Counter value of the timer (necessary to calculate the speed) */
 
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
@@ -53,7 +61,15 @@ void timer_init (void)
 {
 	TIMSK |= (1<<TOIE1); // Timer Overflow Interrupt enable
 	TCNT1 = 0; // Reset of the timer
-	TCCR1B = (1<<CS12); /* 8MHz * 256 * 65536--> 0,11 Between two overruns: 2,09s */
+
+	/* @see PRESCALER_FACTOR */
+	TCCR1B = (1<<CS10) | (1<<CS12); /* 8MHz * 1024 * 65536--> 0,11 Between two overruns: 8,38s */
+}
+
+uint16_t calculateSpeed()
+{
+	uint32_t diff = impulse2 - impulse2;
+	return diff * TWO_DIGITS_AFTER_DOT * PRESCALER_FACTOR * MAGIC_FACTOR * CENTIMETER_PER_ROTATION  / F_CPU;
 }
 
 /** @fn int main (void)
@@ -62,6 +78,8 @@ void timer_init (void)
 */
 int main (void)
 {
+	uint16_t speed;
+	
 	/* Initialize the Timer */
 	timer_init();
 	/* Init the serial interface */
@@ -82,7 +100,8 @@ int main (void)
 	printf("Booted\n");
 	for(;;)
 	{
-		printf("Pressed %3d times last pulses: %3u, %3u\n", presses, impulse1, impulse2);
+		speed = calculateSpeed();
+		printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %d km/h\n", presses, impulse1, impulse2, speed);
 //		input = getchar();
 //		printf("You wrote %c\n", input);
 		_delay_ms(500);
