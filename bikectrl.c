@@ -13,15 +13,16 @@
 #include <stdio.h>
 #include "uart.h"
 
-#define PRESCALER_FACTOR	1024	/**< Factore needed to calculate the detected tick-frequency */
-
 #define CENTIMETER_PER_ROTATION	686	/**< The length of the wheel, FIXME: Make this value variable in the flash */
-#define MAGIC_FACTOR		36	/**< This is the last number, resulting of the convertion:
-					 * - from ms to seconds
+
+#define PRESCALER_FACTOR	1024	/**< Factore needed to calculate the detected tick-frequency */
+#define	HZ2MS			1000	/**< Factore to convert impulse diff to a duration in milliseconds */
+#define MAGIC_FACTOR		3600	/**< This is the last number, resulting of the convertion:
+					 * - from 1/s to seconds
 					 * - m/s to km/h
 					 * - length in cm by one rotation of the wheel
+					 * - Display 425 for 4.25km/h
 					 */
-#define TWO_DIGITS_AFTER_DOT	100	/**< Display 425 for 4.25km/h */
 
 volatile unsigned int presses=0;
 
@@ -68,8 +69,9 @@ void timer_init (void)
 
 uint16_t calculateSpeed()
 {
-	uint32_t diff = impulse2 - impulse2;
-	return diff * TWO_DIGITS_AFTER_DOT * PRESCALER_FACTOR * MAGIC_FACTOR * CENTIMETER_PER_ROTATION  / F_CPU;
+	int diff = impulse2 - impulse2;
+	uint16_t diffMs = (diff * PRESCALER_FACTOR * HZ2MS) / F_CPU;
+	return (uint16_t) ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
 }
 
 /** @fn int main (void)
