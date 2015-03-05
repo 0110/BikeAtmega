@@ -17,6 +17,8 @@
 
 #define PRESCALER_FACTOR	1024	/**< Factore needed to calculate the detected tick-frequency */
 #define	HZ2MS			1000	/**< Factore to convert impulse diff to a duration in milliseconds */
+#define CPU_OPTIMIZED		800	/**< F_CPU is expected to 8MHz, combined with HZ2MS */
+
 #define MAGIC_FACTOR		3600	/**< This is the last number, resulting of the convertion:
 					 * - from 1/s to seconds
 					 * - m/s to km/h
@@ -78,9 +80,9 @@ uint16_t calculateSpeed()
 	{
 		return 0;
 	}
-	uint32_t diffMs = (diff * PRESCALER_FACTOR * HZ2MS) / F_CPU;
+	uint16_t diffMs = (diff * PRESCALER_FACTOR) / CPU_OPTIMIZED;
 	uint16_t km_h = ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
-	return diffMs;
+	return km_h;
 }
 
 /** @fn int main (void)
