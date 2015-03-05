@@ -2,16 +2,24 @@
 * @file bikectrl.c
 * @brief Simple bike computer
 * @author Ollo
-* @version 0.1
+* @version 0.2
 *
 * 
 */
+
+/******************************************************************************
+* INCLUDES
+******************************************************************************/
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/sleep.h>
 #include <stdio.h>
 #include "uart.h"
+
+/******************************************************************************
+* DEFINITIONS
+******************************************************************************/
 
 #define CENTIMETER_PER_ROTATION	686	/**< The length of the wheel, FIXME: Make this value variable in the flash */
 
@@ -28,10 +36,22 @@
 
 #define DEBOUNCING_VALUE	2755	/**< Ticks, that must be passed to be counted (debouncing) */
 
+/******************************************************************************
+* TYPE DEFINITIONS
+******************************************************************************/
+
+/******************************************************************************
+* GLOBAL VARIABLES
+******************************************************************************/
+
 volatile unsigned int presses=0;
 
 volatile uint16_t impulse1=0;	/**< Counter value of the timer (necessary to calculate the speed) */
 volatile uint16_t impulse2=0;	/**< Counter value of the timer (necessary to calculate the speed) */
+
+/******************************************************************************
+* INTERUPT FUNCTIONS
+******************************************************************************/
 
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
@@ -61,9 +81,13 @@ ISR(INT0_vect)
 	}
 }
 
+/******************************************************************************
+* LOCAL FUNCTIONS
+******************************************************************************/
+
 /** @fn void timer_init (void)
-* @brief activiation of the timer.
-*/
+ * @brief activiation of the timer.
+ */
 void timer_init (void)
 {
 	TIMSK |= (1<<TOIE1); // Timer Overflow Interrupt enable
@@ -73,6 +97,11 @@ void timer_init (void)
 	TCCR1B = (1<<CS10) | (1<<CS12); /* 8MHz * 1024 * 65536--> 0,11 Between two overruns: 8,38s */
 }
 
+/** @fn uint16_t calculateSpeed()
+ * @brief Calculate the Speed
+ * @return the Speed 2.45km/h as 245
+ * 
+ */
 uint16_t calculateSpeed()
 {
 	uint16_t diff = impulse2 - impulse1;
@@ -86,9 +115,9 @@ uint16_t calculateSpeed()
 }
 
 /** @fn int main (void)
-* @brief main entry point
-* Initializing the hardware IO, the timer and the SPI logic.
-*/
+ * @brief main entry point
+ * Initializing the hardware IO, the timer and the SPI logic.
+ */
 int main (void)
 {
 	uint16_t speed;
