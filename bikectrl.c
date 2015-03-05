@@ -24,6 +24,8 @@
 					 * - Display 425 for 4.25km/h
 					 */
 
+#define DEBOUNCING_VALUE	2755	/**< Ticks, that must be passed to be counted (debouncing) */
+
 volatile unsigned int presses=0;
 
 volatile uint16_t impulse1=0;	/**< Counter value of the timer (necessary to calculate the speed) */
@@ -49,7 +51,7 @@ ISR (TIMER1_OVF_vect)
 ISR(INT0_vect)
 {
 	/* store the counter value of the last two pulses */
-	if ((TCNT1 - impulse2) > 100) /* software debouncing */
+	if ((TCNT1 - impulse2) > DEBOUNCING_VALUE) /* software debouncing */
 	{
 		impulse1=impulse2;
 		impulse2=TCNT1;
@@ -76,9 +78,9 @@ uint16_t calculateSpeed()
 	{
 		return 0;
 	}
-	uint16_t diffMs = (diff * PRESCALER_FACTOR * HZ2MS) / F_CPU;
+	uint32_t diffMs = (diff * PRESCALER_FACTOR * HZ2MS) / F_CPU;
 	uint16_t km_h = ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
-	return km_h;
+	return diffMs;
 }
 
 /** @fn int main (void)
