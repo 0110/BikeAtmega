@@ -26,8 +26,8 @@
 
 volatile unsigned int presses=0;
 
-volatile unsigned int impulse1=0;	/**< Counter value of the timer (necessary to calculate the speed) */
-volatile unsigned int impulse2=0;	/**< Counter value of the timer (necessary to calculate the speed) */
+volatile uint16_t impulse1=0;	/**< Counter value of the timer (necessary to calculate the speed) */
+volatile uint16_t impulse2=0;	/**< Counter value of the timer (necessary to calculate the speed) */
 
 /** @fn ISR (TIMER1_OVF_vect)
 * @brief Overflow interrupt of the timer
@@ -48,13 +48,12 @@ ISR (TIMER1_OVF_vect)
  */
 ISR(INT0_vect)
 {
-	presses++;
-
 	/* store the counter value of the last two pulses */
-	if (impulse2 != TCNT1) /* software debouncing */
+	if ((TCNT1 - impulse2) > 100) /* software debouncing */
 	{
 		impulse1=impulse2;
 		impulse2=TCNT1;
+		presses++;
 	}
 }
 
@@ -72,7 +71,7 @@ void timer_init (void)
 
 uint16_t calculateSpeed()
 {
-	int diff = impulse2 - impulse1;
+	uint16_t diff = impulse2 - impulse1;
 	if (diff == 0)
 	{
 		return 0;
