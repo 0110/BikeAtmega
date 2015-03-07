@@ -27,13 +27,6 @@
 #define	HZ2MS			1000	/**< Factore to convert impulse diff to a duration in milliseconds */
 #define CPU_OPTIMIZED		800	/**< F_CPU is expected to 8MHz, combined with HZ2MS */
 
-#define MAGIC_FACTOR		3600	/**< This is the last number, resulting of the convertion:
-					 * - from 1/s to seconds
-					 * - m/s to km/h
-					 * - length in cm by one rotation of the wheel
-					 * - Display 425 for 4.25km/h
-					 */
-
 #define DEBOUNCING_VALUE	2755	/**< Ticks, that must be passed to be counted (debouncing) */
 
 /******************************************************************************
@@ -99,7 +92,7 @@ void timer_init (void)
 
 /** @fn uint16_t calculateSpeed()
  * @brief Calculate the Speed
- * @return the Speed 2.45km/h as 245
+ * @return the Speed 0.81m/s as 81m/s
  * 
  */
 uint16_t calculateSpeed()
@@ -110,8 +103,9 @@ uint16_t calculateSpeed()
 		return 0;
 	}
 	uint16_t diffMs = (diff * PRESCALER_FACTOR) / CPU_OPTIMIZED;
-	uint16_t km_h = ((CENTIMETER_PER_ROTATION * MAGIC_FACTOR ) / diffMs);
-	return km_h;
+	printf("diff=%d\n", diffMs);
+	uint16_t m_s = (CENTIMETER_PER_ROTATION / diffMs);
+	return m_s;
 }
 
 /** @fn int main (void)
@@ -130,7 +124,6 @@ int main (void)
 	stdin = &uart_input;
 	/* Initialize Interrupt input */
 	DDRD &= ~(_BV(PD2));		// Set PD2 as input (Using for interupt INT0)
-	//PORTD = _BV(PD2);		// Enable PD2 pull-up resistor
 	GICR = _BV(INT0);                 // Enable INT0
 	MCUCR = _BV(ISC01) | _BV(ISC00);	// Trigger INT0 on rising edge
 
@@ -145,7 +138,7 @@ int main (void)
 		speed = calculateSpeed();
 		if (presses > 0)
 		{
-			printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %u km/h\n", 
+			printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %u m/s\n", 
 				presses, impulse1, impulse2, speed);
 		}
 //		input = getchar();
