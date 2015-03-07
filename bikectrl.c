@@ -25,7 +25,7 @@
 
 #define PRESCALER_FACTOR	1024	/**< Factore needed to calculate the detected tick-frequency */
 #define	HZ2MS			1000	/**< Factore to convert impulse diff to a duration in milliseconds */
-#define CPU_OPTIMIZED		800	/**< F_CPU is expected to 8MHz, combined with HZ2MS */
+#define CPU_OPTIMIZED		12	/**< F_CPU is expected to 8MHz: CPU_OPTIMIZED/100 is the amount of ms at one timestep */
 
 #define DEBOUNCING_VALUE	2755	/**< Ticks, that must be passed to be counted (debouncing) */
 
@@ -102,7 +102,7 @@ uint16_t calculateSpeed()
 	{
 		return 0;
 	}
-	uint16_t diffMs = (diff * PRESCALER_FACTOR) / CPU_OPTIMIZED;
+	uint16_t diffMs = diff / CPU_OPTIMIZED;
 	printf("diff=%d\n", diffMs);
 	uint16_t m_s = (CENTIMETER_PER_ROTATION / diffMs);
 	return m_s;
