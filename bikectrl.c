@@ -129,8 +129,8 @@ int main (void)
 	stdout = &uart_output;
 	stdin = &uart_input;
 	/* Initialize Interrupt input */
-	DDRD = _BV(PD2);		// Set PD2 as input (Using for interupt INT0)
-	PORTD = _BV(PD2);		// Enable PD2 pull-up resistor
+	DDRD &= ~(_BV(PD2));		// Set PD2 as input (Using for interupt INT0)
+	//PORTD = _BV(PD2);		// Enable PD2 pull-up resistor
 	GICR = _BV(INT0);                 // Enable INT0
 	MCUCR = _BV(ISC01) | _BV(ISC00);	// Trigger INT0 on rising edge
 
@@ -143,7 +143,11 @@ int main (void)
 	for(;;)
 	{
 		speed = calculateSpeed();
-		printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %u km/h\n", presses, impulse1, impulse2, speed);
+		if (presses > 0)
+		{
+			printf("Pressed %3d times last pulses: %5u %5u\tSpeed: %u km/h\n", 
+				presses, impulse1, impulse2, speed);
+		}
 //		input = getchar();
 //		printf("You wrote %c\n", input);
 		_delay_ms(500);
